@@ -65,3 +65,31 @@ def Q_learning(env, num_episodes, gamma, alpha, epsilon):
             if done: break
 
     return Q
+
+def TD_0(env, policy, num_episodes, gamma, alpha):
+    # intialize value array
+    V = np.zeros(env.num_states)
+
+    # looping through all episodes
+    for episode in range(num_episodes):
+        # initialize state
+        state = env.reset()
+
+        # step through the environment
+        for t in itertools.count():
+            # take an action
+            action = np.argmax(policy[state])
+            
+            # take a step
+            next_state, reward, done = env.step(action)
+
+            # update value function 
+            V[state] = V[state] + alpha * (reward + gamma * V[next_state] - V[state])
+
+            # update state
+            state = next_state
+
+            if done: break
+
+    return V
+

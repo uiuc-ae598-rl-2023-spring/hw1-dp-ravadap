@@ -41,6 +41,7 @@ def policy_improvement(env, gamma):
 
     # random policy
     policy = np.ones((env.num_states, env.num_actions)) / env.num_actions
+    mean_value_function = []
     while True:
         policy_stable = True
         
@@ -62,8 +63,9 @@ def policy_improvement(env, gamma):
                 policy_stable = False
             policy[s] = np.eye(env.num_actions)[best_action]
 
+        mean_value_function.append(np.mean(V))
         # return policy if the policy is stable
-        if policy_stable: return policy, V
+        if policy_stable: return policy, V, mean_value_function
 
 def value_iteration(env, gamma, theta=0.00001):
     # initialize value array
@@ -71,6 +73,7 @@ def value_iteration(env, gamma, theta=0.00001):
 
     # Loop until delta < theta
     delta = 1
+    mean_value_function = []
     while delta > theta:
         delta = 0
         # loop for each state to perform a full back up
@@ -87,6 +90,9 @@ def value_iteration(env, gamma, theta=0.00001):
             # update value function
             V[s] = best_action_value
 
+            # calculate mean value
+        mean_value_function.append(np.mean(V))
+
     # Output deterministic policy
     policy = np.zeros((env.num_states, env.num_actions))
     for s in range(env.num_states):
@@ -98,4 +104,4 @@ def value_iteration(env, gamma, theta=0.00001):
         policy[s, best_action] = 1.0
 
     
-    return policy, V
+    return policy, V, mean_value_function
