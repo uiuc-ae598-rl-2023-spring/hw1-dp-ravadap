@@ -2,6 +2,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import gridworld
+import model_based
 
 def main():
     # Create environment
@@ -17,6 +18,12 @@ def main():
         'a': [],
         'r': [],
     }
+
+    # they converge to the same policy and value function !
+    gamma = 0.95
+    policy_pi, V_pi = model_based.policy_improvement(env, gamma)
+    
+    policy_vi, V_vi = model_based.value_iteration(env, gamma)
 
     # Simulate until episode is done
     done = False
