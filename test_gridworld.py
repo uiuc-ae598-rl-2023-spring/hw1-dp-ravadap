@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import gridworld
 import model_based
+import model_free
 
 def main():
     # Create environment
@@ -24,6 +25,18 @@ def main():
     policy_pi, V_pi = model_based.policy_improvement(env, gamma)
     
     policy_vi, V_vi = model_based.value_iteration(env, gamma)
+
+    # change these parameters based on model
+    gamma = 0.95
+    alpha = 0.05
+    epsilon = 0.1
+    episodes = 100
+
+    Q_SARSA = model_free.SARSA(env, episodes, gamma, alpha, epsilon)
+    print(Q_SARSA)
+
+    Q_LEARNING = model_free.Q_learning(env, episodes, gamma, alpha, epsilon)
+    print(Q_LEARNING)
 
     # Simulate until episode is done
     done = False

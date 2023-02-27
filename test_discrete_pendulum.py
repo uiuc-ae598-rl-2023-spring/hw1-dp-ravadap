@@ -2,6 +2,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import discrete_pendulum
+import model_free
 
 def test_x_to_s(env):
     theta = np.linspace(-np.pi * (1 - (1 / env.n_theta)), np.pi * (1 - (1 / env.n_theta)), env.n_theta)
@@ -48,6 +49,18 @@ def main():
         'theta': [env.x[0]],        # agent does not have access to this, but helpful for display
         'thetadot': [env.x[1]],     # agent does not have access to this, but helpful for display
     }
+
+    # Have to change these parameters based on model
+    gamma = 0.95
+    alpha = 0.05
+    epsilon = 0.1
+    episodes = 100
+
+    Q_SARSA = model_free.SARSA(env, episodes, gamma, alpha, epsilon)
+    print(Q_SARSA)
+
+    Q_LEARNING = model_free.Q_learning(env, episodes, gamma, alpha, epsilon)
+    print(Q_LEARNING)
 
     # Simulate until episode is done
     done = False
