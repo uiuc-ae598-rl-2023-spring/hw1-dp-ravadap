@@ -1,4 +1,4 @@
-# HW1 - Dynamic Programming
+# HW1 - Dynamic Programming PR
 
 ## What to do
 
