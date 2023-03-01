@@ -1,5 +1,6 @@
 import numpy as np
 import itertools
+import matplotlib.pyplot as plt
 
 def epsilon_greedy_policy(Q, epsilon, state):
     if np.random.uniform(0,1) < epsilon:
@@ -9,15 +10,27 @@ def epsilon_greedy_policy(Q, epsilon, state):
         # choose best action
         return np.argmax(Q[state])
 
-def SARSA(env, num_episodes, gamma, alpha, epsilon):
+def SARSA(env, num_episodes, gamma, alpha, epsilon, path):
     # initialize Q matrix
     Q = np.zeros((env.num_states, env.num_actions))
+
+    # rewards for plotting
+    ep_reward = np.zeros(num_episodes)
 
     # loop through episodes
     for episode in range(num_episodes):
         # initialize s
         state = env.reset()
         action = epsilon_greedy_policy(Q, epsilon, state)
+
+        # For plotting
+        # Create log to store data from simulation
+        log = {
+            't': [0],
+            's': [state],
+            'a': [],
+            'r': [],
+        }
 
         # step through the environment
         for t in itertools.count():
@@ -34,18 +47,59 @@ def SARSA(env, num_episodes, gamma, alpha, epsilon):
             state = next_state
             action = next_action
 
+            # update values for plotting
+            ep_reward[episode] += reward
+
+            log['t'].append(log['t'][-1] + 1)
+            log['s'].append(state)
+            log['a'].append(action)
+            log['r'].append(reward)
+
             if done: break
+
+    # Subplots
+    fig, axs = plt.subplots(2, 1)
+
+    # Plot data and save to png file
+    axs[0].plot(np.arange(num_episodes), ep_reward)
+    axs[0].set_xlabel('Episodes')
+    axs[0].set_ylabel('Reward')
+    axs[0].grid()
+
+    axs[1].plot(log['t'], log['s'])
+    axs[1].plot(log['t'][:-1], log['a'])
+    axs[1].plot(log['t'][:-1], log['r'])
+    axs[1].set_xlabel('t')
+    axs[1].set_ylabel('State | Action | Reward')
+    axs[1].legend(['s', 'a', 'r'], loc="upper right")
+    axs[1].grid()
+
+    fig.tight_layout()
+    
+    plt.savefig(path)
 
     return Q
 
-def Q_learning(env, num_episodes, gamma, alpha, epsilon):
+def Q_learning(env, num_episodes, gamma, alpha, epsilon, path):
     # initialize Q matrix
     Q = np.zeros((env.num_states, env.num_actions))
+
+    # rewards for plotting
+    ep_reward = np.zeros(num_episodes)
 
     # loop through episodes
     for episode in range(num_episodes):
         # initialize s
         state = env.reset()
+
+        # For plotting
+        # Create log to store data from simulation
+        log = {
+            't': [0],
+            's': [state],
+            'a': [],
+            'r': [],
+        }
 
         # step through the environment
         for t in itertools.count():
@@ -62,7 +116,36 @@ def Q_learning(env, num_episodes, gamma, alpha, epsilon):
             # update state and action
             state = next_state
 
+            # update values for plotting
+            ep_reward[episode] += reward
+
+            log['t'].append(log['t'][-1] + 1)
+            log['s'].append(state)
+            log['a'].append(action)
+            log['r'].append(reward)
+
             if done: break
+
+    # Subplots
+    fig, axs = plt.subplots(2, 1)
+
+    # Plot data and save to png file
+    axs[0].plot(np.arange(num_episodes), ep_reward)
+    axs[0].set_xlabel('Episodes')
+    axs[0].set_ylabel('Reward')
+    axs[0].grid()
+
+    axs[1].plot(log['t'], log['s'])
+    axs[1].plot(log['t'][:-1], log['a'])
+    axs[1].plot(log['t'][:-1], log['r'])
+    axs[1].set_xlabel('t')
+    axs[1].set_ylabel('State | Action | Reward')
+    axs[1].legend(['s', 'a', 'r'], loc="upper right")
+    axs[1].grid()
+
+    fig.tight_layout()
+    
+    plt.savefig(path)
 
     return Q
 

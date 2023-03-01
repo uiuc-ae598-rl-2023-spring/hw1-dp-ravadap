@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import itertools
 
 def policy_eval(policy, env, gamma, theta=0.00001):
     # Initialize value array
@@ -105,3 +107,70 @@ def value_iteration(env, gamma, theta=0.00001):
 
     
     return policy, V, mean_value_function
+
+# plotting trajectory
+def plotting_sar_trace_model_based(env, policy, mvf, path):
+    # Initialize simulation
+    s = env.reset()
+
+    # Create log to store data from simulation
+    log = {
+        't': [0],
+        's': [s],
+        'a': [],
+        'r': [],
+    }
+
+    # Simulate until episode is done
+    done = False
+    while not done:
+        a = np.argmax(policy[s])
+        (s, r, done) = env.step(a)
+        log['t'].append(log['t'][-1] + 1)
+        log['s'].append(s)
+        log['a'].append(a)
+        log['r'].append(r)
+
+    # Subplots
+    fig, axs = plt.subplots(2, 1)
+
+    # Plot data and save to png file
+    iters = np.arange(1, np.size(mvf)+1)
+    axs[0].plot(iters, mvf)
+    axs[0].set_xlabel('Iterations')
+    axs[0].set_ylabel('Mean Value of Value Function')
+    axs[0].grid()
+
+    axs[1].plot(log['t'], log['s'])
+    axs[1].plot(log['t'][:-1], log['a'])
+    axs[1].plot(log['t'][:-1], log['r'])
+    axs[1].set_xlabel('t')
+    axs[1].set_ylabel('State | Action | Reward')
+    axs[1].legend(['s', 'a', 'r'])
+    axs[1].grid()
+
+    fig.tight_layout()
+    
+    plt.savefig(path)
+
+# plotting state value function and policy
+def policy_and_state_value_function_plotting(policy, V, path):
+    fig, axs = plt.subplots(1, 2)
+
+    # policy
+    policy_actions = ['right', 'up', 'left', 'down']
+    axs[0].imshow(policy, interpolation='nearest', cmap='cool')
+    axs[0].set_title('Policy')
+    for x,y in itertools.product(range(5), range(5)):
+        val = policy_actions[policy[x,y]]
+        axs[0].text(y,x, f'{val}', ha  = 'center', va = 'center', size = 'x-small', weight = 'roman')
+
+    # state value function
+    axs[1].imshow(V, interpolation='nearest', cmap='cool')
+    axs[1].set_title('State Value Function')
+    for x,y in itertools.product(range(5), range(5)):
+        val = '{:.2f}'.format(round(V[x,y], 2))
+        axs[1].text(y,x, f'{val}', ha  = 'center', va = 'center', size = 'x-small', weight = 'roman')
+
+    plt.savefig(path)
+

@@ -52,15 +52,21 @@ def main():
 
     # Have to change these parameters based on model
     gamma = 0.95
-    alpha = 0.05
+    alpha = 0.5
     epsilon = 0.1
-    episodes = 100
+    episodes = 1000
 
     Q_SARSA = model_free.SARSA(env, episodes, gamma, alpha, epsilon)
-    print(Q_SARSA)
+    # print(Q_SARSA)
 
     Q_LEARNING = model_free.Q_learning(env, episodes, gamma, alpha, epsilon)
-    print(Q_LEARNING)
+    # print(Q_LEARNING)
+
+    V_SARSA = model_free.TD_0(env, Q_SARSA, episodes, gamma, alpha)
+    print(V_SARSA)
+    
+    V_Q_LEARNING = model_free.TD_0(env, Q_LEARNING, episodes, gamma, alpha)
+    print(V_Q_LEARNING)
 
     # Simulate until episode is done
     done = False
