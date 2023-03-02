@@ -10,7 +10,7 @@ def epsilon_greedy_policy(Q, epsilon, state):
         # choose best action
         return np.argmax(Q[state])
 
-def SARSA(env, num_episodes, gamma, alpha, epsilon, path):
+def SARSA(env, num_episodes, gamma, alpha, epsilon, path, pendulum):
     # initialize Q matrix
     Q = np.zeros((env.num_states, env.num_actions))
 
@@ -31,6 +31,10 @@ def SARSA(env, num_episodes, gamma, alpha, epsilon, path):
             'a': [],
             'r': [],
         }
+
+        if pendulum:
+            log['theta'] = [env.x[0]] 
+            log['thetadot'] = [env.x[1]]
 
         # step through the environment
         for t in itertools.count():
@@ -55,10 +59,16 @@ def SARSA(env, num_episodes, gamma, alpha, epsilon, path):
             log['a'].append(action)
             log['r'].append(reward)
 
+            if pendulum:
+                log['theta'].append(env.x[0])
+                log['thetadot'].append(env.x[1])
+
             if done: break
 
     # Subplots
     fig, axs = plt.subplots(2, 1)
+    
+    if pendulum: fig, axs = plt.subplots(3, 1)
 
     # Plot data and save to png file
     axs[0].plot(np.arange(num_episodes), ep_reward)
@@ -74,13 +84,21 @@ def SARSA(env, num_episodes, gamma, alpha, epsilon, path):
     axs[1].legend(['s', 'a', 'r'], loc="upper right")
     axs[1].grid()
 
+    if pendulum: 
+        axs[2].plot(log['t'], log['theta'])
+        axs[2].plot(log['t'], log['thetadot'])
+        axs[2].set_xlabel('t')
+        axs[2].set_ylabel('Theta | ThetaDot')
+        axs[2].legend(['Theta', 'ThetaDot'])
+        axs[2].grid()
+    
     fig.tight_layout()
     
     plt.savefig(path)
 
     return Q
 
-def Q_learning(env, num_episodes, gamma, alpha, epsilon, path):
+def Q_learning(env, num_episodes, gamma, alpha, epsilon, path, pendulum):
     # initialize Q matrix
     Q = np.zeros((env.num_states, env.num_actions))
 
@@ -100,6 +118,10 @@ def Q_learning(env, num_episodes, gamma, alpha, epsilon, path):
             'a': [],
             'r': [],
         }
+
+        if pendulum:
+            log['theta'] = [env.x[0]] 
+            log['thetadot'] = [env.x[1]]
 
         # step through the environment
         for t in itertools.count():
@@ -124,10 +146,16 @@ def Q_learning(env, num_episodes, gamma, alpha, epsilon, path):
             log['a'].append(action)
             log['r'].append(reward)
 
+            if pendulum:
+                log['theta'].append(env.x[0])
+                log['thetadot'].append(env.x[1])
+
             if done: break
 
     # Subplots
     fig, axs = plt.subplots(2, 1)
+
+    if pendulum: fig, axs = plt.subplots(3, 1)
 
     # Plot data and save to png file
     axs[0].plot(np.arange(num_episodes), ep_reward)
@@ -142,6 +170,14 @@ def Q_learning(env, num_episodes, gamma, alpha, epsilon, path):
     axs[1].set_ylabel('State | Action | Reward')
     axs[1].legend(['s', 'a', 'r'], loc="upper right")
     axs[1].grid()
+
+    if pendulum: 
+        axs[2].plot(log['t'], log['theta'])
+        axs[2].plot(log['t'], log['thetadot'])
+        axs[2].set_xlabel('t')
+        axs[2].set_ylabel('Theta | ThetaDot')
+        axs[2].legend(['Theta', 'ThetaDot'])
+        axs[2].grid()
 
     fig.tight_layout()
     
@@ -175,4 +211,25 @@ def TD_0(env, policy, num_episodes, gamma, alpha):
             if done: break
 
     return V
+
+# plotting state value function and policy
+def policy_and_state_value_function_plotting(policy, V, path):
+    fig, axs = plt.subplots(1, 2, figsize=(25, 25))
+
+    # policy
+    # policy_actions = ['right', 'up', 'left', 'down']
+    axs[0].imshow(policy, interpolation='nearest', cmap='cool')
+    axs[0].set_title('Policy')
+    for x,y in itertools.product(range(15), range(21)):
+        val = policy[x,y]
+        axs[0].text(y,x, f'{val}', ha  = 'center', va = 'center', size = 'x-small', weight = 'roman')
+
+    # state value function
+    axs[1].imshow(V, interpolation='nearest', cmap='cool')
+    axs[1].set_title('State Value Function')
+    for x,y in itertools.product(range(15), range(21)):
+        val = '{:.2f}'.format(round(V[x,y], 2))
+        axs[1].text(y,x, f'{val}', ha  = 'center', va = 'center', size = 'x-small', weight = 'roman')
+
+    plt.savefig(path)
 
