@@ -42,9 +42,9 @@ def main():
 
     # Have to change these parameters based on model
     gamma = 0.95
-    alpha = 0.3
-    epsilon = 0.7
-    episodes = 5000
+    alpha = 0.2
+    epsilon = 0.75
+    episodes = 2000
 
     pendulum = True
     
@@ -62,17 +62,21 @@ def main():
     V_Q_LEARNING = model_free.TD_0(env, Q_LEARNING, episodes, gamma, alpha)
     # print(V_Q_LEARNING.reshape(15, 21))
 
+    print('here1')
+
     # for epsilon variation
     epsilon_vals = np.linspace(0,1, num=5, endpoint=True)
     Q_SARSA_Returns_ep = []
     Q_LEARNING_Returns_ep = []
     alpha1 = 0.2
     for ep in epsilon_vals:
-        _, ep_return = model_free.SARSA(env, episodes, gamma, alpha1, ep)
+        _, ep_return, _ = model_free.SARSA(env, episodes, gamma, alpha1, ep, pendulum)
         Q_SARSA_Returns_ep.append(ep_return)
 
-        _, ep_return = model_free.Q_learning(env, episodes, gamma, alpha1, ep)
+        _, ep_return, _ = model_free.Q_learning(env, episodes, gamma, alpha1, ep, pendulum)
         Q_LEARNING_Returns_ep.append(ep_return)
+
+    print('here2')
 
     # for alpha variation
     alpha_vals = np.linspace(0,1, num=5, endpoint=True)
@@ -80,11 +84,13 @@ def main():
     Q_LEARNING_Returns_alp = []
     epsilon1 = 0.5
     for alp in alpha_vals:
-        _, ep_return = model_free.SARSA(env, episodes, gamma, alp, epsilon1)
+        _, ep_return, _ = model_free.SARSA(env, episodes, gamma, alp, epsilon1, pendulum)
         Q_SARSA_Returns_alp.append(ep_return)
 
-        _, ep_return = model_free.Q_learning(env, episodes, gamma, alp, epsilon1)
+        _, ep_return, _ = model_free.Q_learning(env, episodes, gamma, alp, epsilon1, pendulum)
         Q_LEARNING_Returns_alp.append(ep_return)
+
+    print('here3')
 
     path = 'figures/pendulum/SARSA_epsilon_and_alpha_variation'
     model_free.plot_vary_parameter(episodes, Q_SARSA_Returns_ep, Q_SARSA_Returns_alp, epsilon_vals, alpha_vals, path)

@@ -248,11 +248,13 @@ def plot_vary_parameter(num_episodes, return_list_epsilon, return_list_alpha, ep
 
     axs[0].set_xlabel('Episodes')
     axs[0].set_ylabel('Return')
+    axs[0].set_yscale('log')
     axs[0].grid()
     axs[0].legend(ep_legend)
 
     axs[1].set_xlabel('Episodes')
     axs[1].set_ylabel('Return')
+    axs[1].set_yscale('log')
     axs[1].grid()
     axs[1].legend(alp_legend)
 
