@@ -40,31 +40,19 @@ def main():
     # Initialize simulation
     s = env.reset()
 
-    # Create log to store data from simulation
-    log = {
-        't': [0],
-        's': [s],
-        'a': [],
-        'r': [],
-        'theta': [env.x[0]],        # agent does not have access to this, but helpful for display
-        'thetadot': [env.x[1]],     # agent does not have access to this, but helpful for display
-    }
-
     # Have to change these parameters based on model
     gamma = 0.95
-    alpha = 0.2
-    epsilon = 0.75
-    episodes = 1000
+    alpha = 0.3
+    epsilon = 0.7
+    episodes = 5000
 
     pendulum = True
-
-    path = 'figures/pendulum/SARSA_trace_and_reward.png'
-    Q_SARSA = model_free.SARSA(env, episodes, gamma, alpha, epsilon, path, pendulum)
+    
+    Q_SARSA, ep_reward_SARSA, log_SARSA = model_free.SARSA(env, episodes, gamma, alpha, epsilon, pendulum)
     policy_Q_SARSA = np.argmax(Q_SARSA, axis = 1)
     # print(policy_Q_SARSA.reshape(15, 21))
 
-    path = 'figures/pendulum/Q_LEARNING_trace_and_reward.png'
-    Q_LEARNING = model_free.Q_learning(env, episodes, gamma, alpha, epsilon, path, pendulum)
+    Q_LEARNING, ep_reward_LEARNING, log_Q_LEARNING = model_free.Q_learning(env, episodes, gamma, alpha, epsilon, pendulum)
     policy_Q_LEARNING = np.argmax(Q_LEARNING, axis = 1)
     # print(policy_Q_LEARNING.reshape(15, 21))
 
@@ -74,11 +62,47 @@ def main():
     V_Q_LEARNING = model_free.TD_0(env, Q_LEARNING, episodes, gamma, alpha)
     # print(V_Q_LEARNING.reshape(15, 21))
 
+    # for epsilon variation
+    epsilon_vals = np.linspace(0,1, num=5, endpoint=True)
+    Q_SARSA_Returns_ep = []
+    Q_LEARNING_Returns_ep = []
+    alpha1 = 0.2
+    for ep in epsilon_vals:
+        _, ep_return = model_free.SARSA(env, episodes, gamma, alpha1, ep)
+        Q_SARSA_Returns_ep.append(ep_return)
+
+        _, ep_return = model_free.Q_learning(env, episodes, gamma, alpha1, ep)
+        Q_LEARNING_Returns_ep.append(ep_return)
+
+    # for alpha variation
+    alpha_vals = np.linspace(0,1, num=5, endpoint=True)
+    Q_SARSA_Returns_alp = []
+    Q_LEARNING_Returns_alp = []
+    epsilon1 = 0.5
+    for alp in alpha_vals:
+        _, ep_return = model_free.SARSA(env, episodes, gamma, alp, epsilon1)
+        Q_SARSA_Returns_alp.append(ep_return)
+
+        _, ep_return = model_free.Q_learning(env, episodes, gamma, alp, epsilon1)
+        Q_LEARNING_Returns_alp.append(ep_return)
+
+    path = 'figures/pendulum/SARSA_epsilon_and_alpha_variation'
+    model_free.plot_vary_parameter(episodes, Q_SARSA_Returns_ep, Q_SARSA_Returns_alp, epsilon_vals, alpha_vals, path)
+
+    path = 'figures/pendulum/Q_LEARNING_epsilon_and_alpha_variation'
+    model_free.plot_vary_parameter(episodes, Q_LEARNING_Returns_ep, Q_LEARNING_Returns_alp, epsilon_vals, alpha_vals, path)
+
     path = 'figures/pendulum/SARSA_policy_and_state_value_function.png'
     model_free.policy_and_state_value_function_plotting(policy_Q_SARSA.reshape(15,21), V_SARSA.reshape(15, 21), path)
 
     path = 'figures/pendulum/Q_LEARNING_policy_and_state_value_function.png'
     model_free.policy_and_state_value_function_plotting(policy_Q_LEARNING.reshape(15,21), V_Q_LEARNING.reshape(15, 21), path)
+
+    path = 'figures/pendulum/SARSA_trace_and_return.png'
+    model_free.plotting_sar_trace_model_free(episodes, ep_reward_SARSA, log_SARSA, path, pendulum)
+
+    path = 'figures/pendulum/Q_LEARNING_trace_and_return.png'
+    model_free.plotting_sar_trace_model_free(episodes, ep_reward_LEARNING, log_Q_LEARNING, path, pendulum)
 
 if __name__ == '__main__':
     main()

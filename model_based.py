@@ -19,9 +19,9 @@ def policy_eval(policy, env, gamma, theta=0.00001):
                 for s1 in range(env.num_states):
                     # Successor state cannot be the same as the current state
                     transition_prob = env.p(s1,s,a)
-                    if s!= s1 and transition_prob!=0:
-                        reward = env.r(s,a)
-                        v += action_prob * transition_prob * (reward + gamma * V[s1])
+                    # if s!= s1 and transition_prob!=0:
+                    reward = env.r(s,a)
+                    v += action_prob * transition_prob * (reward + gamma * V[s1])
             delta = max(delta, np.abs(v - V[s]))
             V[s] = v
     return np.array(V)
@@ -34,9 +34,9 @@ def look_one_step_ahead(env, gamma, s, V):
         for s1 in range(env.num_states):
             # Successor state cannot be the same as the current state
             transition_prob = env.p(s1,s,a)
-            if s!= s1 and transition_prob!=0:
-                reward = env.r(s,a)
-                action_expected_value[a] += transition_prob * (reward + gamma * V[s1])
+            # if s!= s1 and transition_prob!=0:
+            reward = env.r(s,a)
+            action_expected_value[a] += transition_prob * (reward + gamma * V[s1])
     return action_expected_value
 
 def policy_improvement(env, gamma):
